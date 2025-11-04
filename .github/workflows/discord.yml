@@ -1,4 +1,4 @@
-name: Webhook notification
+name: Discord Notification
 
 on:
   push:
@@ -39,10 +39,40 @@ jobs:
           DATE=$(jq -r '.[keys[-1]].Date // "Není dostupné"' changelog.json 2>/dev/null || echo "Není dostupné")
           CONTENT=$(jq -r '.[keys[-1]].Content[] // empty' changelog.json 2>/dev/null | sed 's/^/- /' | paste -sd '\n' || echo "Žádný obsah")
           echo "Extrahovaný Content: $CONTENT"
-          MESSAGE="**Nový commit v repozitáři!**\n"
-          MESSAGE+="**Autor:** ${COMMIT_AUTHOR}\n"
-          MESSAGE+="**Zpráva:** ${COMMIT_MESSAGE}\n"
-          MESSAGE+="**Odkaz:** ${COMMIT_URL}\n"
-          MESSAGE+="\n**Changelog (${VERSION} - ${DATE}):**\n${TITLE}\n${CONTENT}\n"
-          echo "Zpráva pro Discord: $MESSAGE"
-          curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$MESSAGE\"}" "$DISCORD_WEBHOOK" || echo "Chyba při odesílání na Discord: $?"
+          
+          # Vytvoření JSON pro Discord Embed
+          EMBED_JSON=$(cat <<EOF
+          {
+            "embeds": [
+              {
+                "title": "$TITLE",
+                "description": "$CONTENT",
+                "color": 15258703,  -- Zelená barva (hex: #E8B923)
+                "fields": [
+                  {
+                    "name": "Autor",
+                    "value": "$COMMIT_AUTHOR",
+                    "inline": true
+                  },
+                  {
+                    "name": "Commit zpráva",
+                    "value": "$COMMIT_MESSAGE",
+                    "inline": true
+                  },
+                  {
+                    "name": "Odkaz",
+                    "value": "$COMMIT_URL",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "Verze: $VERSION | Datum: $DATE"
+                }
+              }
+            ]
+          }
+          EOF
+          )
+          
+          echo "Zpráva pro Discord (JSON): $EMBED_JSON"
+          curl -H "Content-Type: application/json" -X POST -d "$EMBED_JSON" "$DISCORD_WEBHOOK" || echo "Chyba při odesílání na Discord: $?"
