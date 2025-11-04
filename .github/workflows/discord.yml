@@ -1,4 +1,4 @@
-name: DC Notification
+name: Notify Discord on Changelog Update
 
 on:
   push:
@@ -40,39 +40,28 @@ jobs:
           CONTENT=$(jq -r '.[keys[-1]].Content[] // empty' changelog.json 2>/dev/null | paste -sd '\n' || echo "Žádný obsah")
           echo "Extrahovaný Content: $CONTENT"
           
-          # Vytvoření JSON pro Discord Embed
-          EMBED_JSON=$(cat <<EOF
-          {
-            "embeds": [
-              {
-                "title": "$TITLE",
-                "description": "$CONTENT",
-                "color": 15258703,
-                "fields": [
-                  {
-                    "name": "Autor",
-                    "value": "$COMMIT_AUTHOR",
-                    "inline": true
-                  },
-                  {
-                    "name": "Commit zpráva",
-                    "value": "$COMMIT_MESSAGE",
-                    "inline": true
-                  },
-                  {
-                    "name": "Odkaz",
-                    "value": "$COMMIT_URL",
-                    "inline": true
-                  }
+          # Vytvoření JSON pro Discord Embed pomocí jq
+          EMBED_JSON=$(jq -n \
+            --arg title "$TITLE" \
+            --arg desc "$CONTENT" \
+            --arg author "$COMMIT_AUTHOR" \
+            --arg commit "$COMMIT_MESSAGE" \
+            --arg url "$COMMIT_URL" \
+            --arg version "$VERSION" \
+            --arg date "$DATE" \
+            '{
+              embeds: [{
+                title: $title,
+                description: $desc,
+                color: 15258703,
+                fields: [
+                  { name: "Autor", value: $author, inline: true },
+                  { name: "Commit zpráva", value: $commit, inline: true },
+                  { name: "Odkaz", value: $url, inline: true }
                 ],
-                "footer": {
-                  "text": "Verze: $VERSION | Datum: $DATE"
-                }
-              }
-            ]
-          }
-          EOF
-          )
+                footer: { text: "Verze: \($version) | Datum: \($date)" }
+              }]
+            }')
           
           echo "Zpráva pro Discord (JSON): $EMBED_JSON"
           curl -H "Content-Type: application/json" -X POST -d "$EMBED_JSON" "$DISCORD_WEBHOOK" || echo "Chyba při odesílání na Discord: $?"
