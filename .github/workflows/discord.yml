@@ -38,14 +38,19 @@ jobs:
           CONTENT=$(jq -r '.[keys[-1]].Content[] // empty' changelog.json 2>/dev/null | paste -sd '\n' || echo "Not found")
           echo "Extrahovaný Content: $CONTENT"
           
+          # Přesný timestamp v UTC (sekundy od epochy)
           TIMESTAMP=$(date -u +%s)
-          CONTEXT="-# [💥] Author: $COMMIT_AUTHOR\\n -# [🗓️] Full date: <t:$TIMESTAMP>"
-          FULL_MESSAGE="$CONTEXT\\n**Game Link**: [JOIN TODAY](https://roblox.com)"
+          # Kontext s explicitními novými řádky
+          CONTEXT="-# ©️ Author: $COMMIT_AUTHOR\n -# 🗓️ Full date: <t:$TIMESTAMP>"
           
+          # Přidání Game Link do description
+          FULL_DESCRIPTION="$CONTENT\n**Game Link**: [JOIN TODAY](https://roblox.com)"
+          
+          # Vytvoření JSON pro Discord Embed
           EMBED_JSON=$(jq -n \
-            --arg content "$FULL_MESSAGE" \
+            --arg content "$CONTEXT" \
             --arg title "$TITLE" \
-            --arg desc "$CONTENT" \
+            --arg desc "$FULL_DESCRIPTION" \
             --arg version "$VERSION" \
             --arg date "$DATE" \
             '{
@@ -58,5 +63,5 @@ jobs:
               }]
             }')
           
-          echo "Message for DC (JSON): $EMBED_JSON"
+          echo "Zpráva pro Discord (JSON): $EMBED_JSON"
           curl -H "Content-Type: application/json" -X POST -d "$EMBED_JSON" "$DISCORD_WEBHOOK" || echo "Chyba při odesílání na Discord: $?"
