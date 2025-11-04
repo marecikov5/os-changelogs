@@ -32,14 +32,14 @@ jobs:
             exit 1
           fi
           COMMIT_AUTHOR=$(git log -1 --pretty=%an | sed 's/"/\\"/g')
-          VERSION=$(jq -r '.[keys[-1]].Version // "N/A"' changelog.json 2>/dev/null || echo "Není dostupné")
-          TITLE=$(jq -r '.[keys[-1]].Title // "N/A"' changelog.json 2>/dev/null || echo "Není dostupné")
-          DATE=$(jq -r '.[keys[-1]].Date // "N/A"' changelog.json 2>/dev/null || echo "Není dostupné")
-          CONTENT=$(jq -r '.[keys[-1]].Content[] // empty' changelog.json 2>/dev/null | paste -sd '\n' || echo "Žádný obsah")
+          VERSION=$(jq -r '.[keys[-1]].Version // "N/A"' changelog.json 2>/dev/null || echo "N/A")
+          TITLE=$(jq -r '.[keys[-1]].Title // "N/A"' changelog.json 2>/dev/null || echo "N/A")
+          DATE=$(jq -r '.[keys[-1]].Date // "N/A"' changelog.json 2>/dev/null || echo "N/A")
+          CONTENT=$(jq -r '.[keys[-1]].Content[] // empty' changelog.json 2>/dev/null | paste -sd '\n' || echo "Not found")
           echo "Extrahovaný Content: $CONTENT"
           
           TIMESTAMP=$(date -u +%s)
-          CONTEXT="-# ©️ Autor: $COMMIT_AUTHOR\n-# 🗓️ Full date: <t:$TIMESTAMP>"
+          CONTEXT="-# ©️ Author: $COMMIT_AUTHOR\n -# 🗓️ Full date: <t:$TIMESTAMP>"
           
           EMBED_JSON=$(jq -n \
             --arg content "$CONTEXT" \
