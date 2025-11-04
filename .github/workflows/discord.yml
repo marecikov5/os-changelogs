@@ -31,34 +31,30 @@ jobs:
             echo "Soubor changelog.json nebyl nalezen!"
             exit 1
           fi
-          COMMIT_MESSAGE=$(git log -1 --pretty=%s | sed 's/"/\\"/g')
           COMMIT_AUTHOR=$(git log -1 --pretty=%an | sed 's/"/\\"/g')
-          COMMIT_URL=$(git log -1 --pretty=%H | xargs -I {} echo "https://github.com/${{ github.repository }}/commit/{}")
           VERSION=$(jq -r '.[keys[-1]].Version // "Není dostupné"' changelog.json 2>/dev/null || echo "Není dostupné")
           TITLE=$(jq -r '.[keys[-1]].Title // "Není dostupné"' changelog.json 2>/dev/null || echo "Není dostupné")
           DATE=$(jq -r '.[keys[-1]].Date // "Není dostupné"' changelog.json 2>/dev/null || echo "Není dostupné")
           CONTENT=$(jq -r '.[keys[-1]].Content[] // empty' changelog.json 2>/dev/null | paste -sd '\n' || echo "Žádný obsah")
           echo "Extrahovaný Content: $CONTENT"
           
-          # Vytvoření JSON pro Discord Embed pomocí jq
+          # Přesný timestamp v UTC (sekundy od epochy)
+          TIMESTAMP=$(date -u +%s)
+          CONTEXT="Odesláno od $COMMIT_AUTHOR, <t:$TIMESTAMP>"
+          
+          # Vytvoření JSON pro Discord Embed
           EMBED_JSON=$(jq -n \
+            --arg content "$CONTEXT" \
             --arg title "$TITLE" \
             --arg desc "$CONTENT" \
-            --arg author "$COMMIT_AUTHOR" \
-            --arg commit "$COMMIT_MESSAGE" \
-            --arg url "$COMMIT_URL" \
             --arg version "$VERSION" \
             --arg date "$DATE" \
             '{
+              content: $content,
               embeds: [{
                 title: $title,
                 description: $desc,
-                color: 15258703,
-                fields: [
-                  { name: "Autor", value: $author, inline: true },
-                  { name: "Commit zpráva", value: $commit, inline: true },
-                  { name: "Odkaz", value: $url, inline: true }
-                ],
+                color: 4618276,  -- Střední modrá (#4682B4)
                 footer: { text: "Verze: \($version) | Datum: \($date)" }
               }]
             }')
