@@ -1,4 +1,4 @@
-name: Notify Discord on Changelog Update
+name: OS Changelogs
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
         run: |
           git diff --name-only HEAD^ HEAD > changed_files.txt
           echo "CHANGED_FILES=$(cat changed_files.txt)" >> $GITHUB_ENV
-          echo "Změněné soubory: $CHANGED_FILES"
+          echo "Changed files: $CHANGED_FILES"
 
       - name: DC sender
         if: contains(env.CHANGED_FILES, 'changelog.json')
@@ -28,21 +28,19 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           if [ ! -f changelog.json ]; then
-            echo "Soubor changelog.json nebyl nalezen!"
+            echo "File changelog.json was not found!"
             exit 1
           fi
           COMMIT_AUTHOR=$(git log -1 --pretty=%an | sed 's/"/\\"/g')
-          VERSION=$(jq -r '.[keys[-1]].Version // "Není dostupné"' changelog.json 2>/dev/null || echo "Není dostupné")
-          TITLE=$(jq -r '.[keys[-1]].Title // "Není dostupné"' changelog.json 2>/dev/null || echo "Není dostupné")
-          DATE=$(jq -r '.[keys[-1]].Date // "Není dostupné"' changelog.json 2>/dev/null || echo "Není dostupné")
+          VERSION=$(jq -r '.[keys[-1]].Version // "N/A"' changelog.json 2>/dev/null || echo "Není dostupné")
+          TITLE=$(jq -r '.[keys[-1]].Title // "N/A"' changelog.json 2>/dev/null || echo "Není dostupné")
+          DATE=$(jq -r '.[keys[-1]].Date // "N/A"' changelog.json 2>/dev/null || echo "Není dostupné")
           CONTENT=$(jq -r '.[keys[-1]].Content[] // empty' changelog.json 2>/dev/null | paste -sd '\n' || echo "Žádný obsah")
           echo "Extrahovaný Content: $CONTENT"
           
-          # Přesný timestamp v UTC (sekundy od epochy)
           TIMESTAMP=$(date -u +%s)
-          CONTEXT="Odesláno od $COMMIT_AUTHOR, <t:$TIMESTAMP>"
+          CONTEXT="-# ©️ Autor: $COMMIT_AUTHOR\n-# 🗓️ Full date: <t:$TIMESTAMP>"
           
-          # Vytvoření JSON pro Discord Embed
           EMBED_JSON=$(jq -n \
             --arg content "$CONTEXT" \
             --arg title "$TITLE" \
@@ -55,7 +53,7 @@ jobs:
                 title: $title,
                 description: $desc,
                 color: 4618276,
-                footer: { text: "Verze: \($version) | Datum: \($date)" }
+                footer: { text: "Version: \($version) | Date: \($date)" }
               }]
             }')
           
