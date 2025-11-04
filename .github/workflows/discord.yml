@@ -39,10 +39,11 @@ jobs:
           echo "Extrahovaný Content: $CONTENT"
           
           TIMESTAMP=$(date -u +%s)
-          CONTEXT="-# ©️ Author: $COMMIT_AUTHOR\n -# 🗓️ Full date: <t:$TIMESTAMP>"
+          CONTEXT="-# [💥] Author: $COMMIT_AUTHOR\\n -# [🗓️] Full date: <t:$TIMESTAMP>"
+          FULL_MESSAGE="$CONTEXT\\n**Game Link**: [JOIN TODAY](https://roblox.com)"
           
           EMBED_JSON=$(jq -n \
-            --arg content "$CONTEXT" \
+            --arg content "$FULL_MESSAGE" \
             --arg title "$TITLE" \
             --arg desc "$CONTENT" \
             --arg version "$VERSION" \
@@ -57,5 +58,5 @@ jobs:
               }]
             }')
           
-          echo "Zpráva pro Discord (JSON): $EMBED_JSON"
+          echo "Message for DC (JSON): $EMBED_JSON"
           curl -H "Content-Type: application/json" -X POST -d "$EMBED_JSON" "$DISCORD_WEBHOOK" || echo "Chyba při odesílání na Discord: $?"
