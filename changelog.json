@@ -36,7 +36,7 @@
   "4": {
     "Date": "4/11/2025",
     "Version": "1.1.2",
-    "Title": "[1.1.2] Test changelog #2",
+    "Title": "[1.1.2] Test changelog (#2)",
     "Content": [
       "- description test",
       "- deacription test 2",
