@@ -40,11 +40,11 @@ jobs:
           
           # Přesný timestamp v UTC (sekundy od epochy)
           TIMESTAMP=$(date -u +%s)
-          # Kontext s explicitními novými řádky
-          CONTEXT="-# ©️ Author: $COMMIT_AUTHOR\n -# 🗓️ Full date: <t:$TIMESTAMP>"
+          # Použití echo -e pro správné zpracování \n v kontextu
+          CONTEXT=$(echo -e "-# ©️ Author: $COMMIT_AUTHOR\n -# 🗓️ Full date: <t:$TIMESTAMP>")
           
-          # Přidání Game Link do description
-          FULL_DESCRIPTION="$CONTENT\n**Game Link**: [JOIN TODAY](https://roblox.com)"
+          # Přidání Game Link do description s novým řádkem
+          FULL_DESCRIPTION=$(echo -e "$CONTENT\n**Game Link**: [JOIN TODAY](https://roblox.com)")
           
           # Vytvoření JSON pro Discord Embed
           EMBED_JSON=$(jq -n \
