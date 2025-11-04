@@ -1,0 +1,26 @@
+{
+  "1": {
+    "Date": "24/10/2025",
+    "Version": "1.0.0",
+    "Title": "[1.0.0] RELEASE",
+    "Content": [
+      "- The game has released! Thank you for playing."
+    ]
+  },
+  "2": {
+    "Date": "2/11/2025",
+    "Version": "1.1.0",
+    "Title": "[1.1.0] Fishing rod & Bugfixes",
+    "Content": [
+      "- Added new fishing rod ; Fish up different things from the sea!",
+      "- Added spawning of food and ammoboxes on structures.",
+      "- Lobby visual changes, teleporter improvements, new stats and changelog boards.",
+      "- Added new music.",
+      "- Headlamps recharge every morning, added new headlamp models.",
+      "- Added new crafting UI.",
+      "- Added settings.",
+      "- Fixed multiple bugs.",
+      "- Multiple QOL improvements."
+    ]
+  }
+}
