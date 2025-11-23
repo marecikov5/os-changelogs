@@ -33,5 +33,19 @@
       "- Added top days leaderboard to lobby.",
       "- Top 100 players worldwide get a special nametag!"
     ]
+  },
+  "4": {
+    "Date": "4/11/2025",
+    "Version": "1.1.2",
+    "Title": "🗡️ Classes",
+    "Content": [
+      "- **Caps!** A new currency used throughout the seas 💰",
+      "- New exclusive shop! Buy exclusive starter items and caps! 🏷️",
+      "- New items: **Katana**, **Golden sack**, **Shotgun**",
+      "- New inventory system",
+      "- 2 New endings",
+      "- New **BOSS** base",
+      "- Lots of improvements and bugfixes"
+    ]
   }
 }
